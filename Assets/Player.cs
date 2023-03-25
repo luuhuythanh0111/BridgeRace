@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class Player : MonoBehaviour
 {
@@ -16,11 +17,15 @@ public class Player : MonoBehaviour
 
     private List<GameObject> bricks = new List<GameObject>();
 
+    private float previousVelocityY;
+    private float currentVeloctiyY;
+
     void Update()
     {
         Move();
         CheckMoveOnStair();
         MoveDownStairSmooth();
+        SpawnBricks();
     }
 
     private void CheckMoveOnStair()
@@ -32,8 +37,6 @@ public class Player : MonoBehaviour
         if (hit.collider != null)
         {
             GameObject block = hit.collider.gameObject;
-
-            
 
             if (block.transform.parent.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<Renderer>().sharedMaterial)
             {
@@ -56,17 +59,15 @@ public class Player : MonoBehaviour
 
     private void MoveDownStairSmooth()
     {
-        RaycastHit hit;
-        Physics.Raycast(transform.position,Vector3.down * 0.5f, out hit, 2f, groundLayer);
-        Debug.DrawLine(transform.position, transform.position + (Vector3.down * 0.5f) * 2f, Color.yellow, 2f);
-
-        if (hit.collider == null)
+        currentVeloctiyY = rigidbody.velocity.y;
+        if(previousVelocityY-currentVeloctiyY > 0.15f)
         {
-            Debug.Log(1);
             rigidbody.velocity = new Vector3(rigidbody.velocity.x,
-                                             -10,
+                                             Mathf.Min(currentVeloctiyY, -5f), 
                                              rigidbody.velocity.z);
         }
+
+        previousVelocityY = currentVeloctiyY;
     }
 
     private void Move()
@@ -82,6 +83,19 @@ public class Player : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direct1);
         if (Vector3.Distance(direct2, Vector3.zero) > 0.1f)
             transform.rotation = Quaternion.LookRotation(direct2);
+    }
+
+    private void SpawnBricks()
+    {
+        RaycastHit hit;
+
+        Physics.Raycast(transform.position, Vector3.down, out hit, 2f,groundLayer);
+        Debug.DrawRay(transform.position, Vector3.down*2f, Color.yellow, 2f);
+
+        if(hit.collider != null)
+        {
+            hit.collider.gameObject.GetComponent<SpawnBricks>().SpawnBrick(transform.GetComponent<Renderer>().sharedMaterial);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
