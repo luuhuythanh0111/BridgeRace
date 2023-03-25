@@ -10,7 +10,9 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float speed;
 
-    [SerializeField] private LayerMask stepBrick;
+    [SerializeField] private LayerMask stepBrickLayer;
+
+    [SerializeField] private LayerMask groundLayer;
 
     private List<GameObject> bricks = new List<GameObject>();
 
@@ -18,32 +20,52 @@ public class Player : MonoBehaviour
     {
         Move();
         CheckMoveOnStair();
+        MoveDownStairSmooth();
     }
 
     private void CheckMoveOnStair()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, Vector3.forward + Vector3.down*0.4f, out hit,2f, stepBrick);
+        Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 2f, stepBrickLayer);
+        //Debug.DrawLine(transform.position, transform.position + (Vector3.forward + Vector3.down * 0.4f) * 2f, Color.red, 2f);
 
-        Debug.DrawLine(transform.position, transform.position + (Vector3.forward + Vector3.down * 0.4f) * 2f, Color.red, 3f);
-
-        if(hit.collider != null)
+        if (hit.collider != null)
         {
             GameObject block = hit.collider.gameObject;
 
-            block.GetComponent<BoxCollider>().enabled = true;
+            
 
             if (block.transform.parent.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<Renderer>().sharedMaterial)
             {
                 block.GetComponent<BoxCollider>().enabled = false;
             }
-            else if(bricks.Count > 0)
+            else if (bricks.Count > 0)
             {
-                Destroy(bricks[bricks.Count-1]);
+                Destroy(bricks[bricks.Count - 1]);
                 bricks.RemoveAt(bricks.Count - 1);
                 block.transform.parent.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
                 block.GetComponent<BoxCollider>().enabled = false;
             }
+            else
+            {
+                block.GetComponent<BoxCollider>().enabled = true;
+            }
+        }
+
+    }
+
+    private void MoveDownStairSmooth()
+    {
+        RaycastHit hit;
+        Physics.Raycast(transform.position,Vector3.down * 0.5f, out hit, 2f, groundLayer);
+        Debug.DrawLine(transform.position, transform.position + (Vector3.down * 0.5f) * 2f, Color.yellow, 2f);
+
+        if (hit.collider == null)
+        {
+            Debug.Log(1);
+            rigidbody.velocity = new Vector3(rigidbody.velocity.x,
+                                             -10,
+                                             rigidbody.velocity.z);
         }
     }
 
