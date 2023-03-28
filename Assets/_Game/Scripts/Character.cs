@@ -1,34 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-public class Player : MonoBehaviour
+public class Character : MonoBehaviour
 {
-    [SerializeField] private Joystick joystick;
+    [SerializeField] protected Joystick joystick;
 
-    [SerializeField] private new Rigidbody rigidbody;
+    [SerializeField] protected new Rigidbody rigidbody;
 
-    [SerializeField] private float speed;
+    [SerializeField] protected float speed;
 
-    [SerializeField] private LayerMask stepBrickLayer;
+    [SerializeField] protected LayerMask stepBrickLayer;
 
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] protected LayerMask groundLayer;
 
-    private List<GameObject> bricks = new List<GameObject>();
+    protected int bodyColorIndex;
 
-    private float previousVelocityY;
-    private float currentVeloctiyY;
+    protected List<GameObject> bricks = new List<GameObject>();
 
-    void Update()
+    protected float previousVelocityY;
+    protected float currentVeloctiyY;
+
+    protected void Start()
     {
-        Move();
+        bodyColorIndex = Random.Range(0, FindObjectOfType<LevelManager>().materials.Count);
+        transform.GetComponent<Renderer>().sharedMaterial = FindObjectOfType<LevelManager>().GetMaterialFromNumber(bodyColorIndex);
+    }
+
+    protected virtual void Update()
+    {
         CheckMoveOnStair();
         MoveDownStairSmooth();
         SpawnBricks();
     }
 
-    private void CheckMoveOnStair()
+    protected void CheckMoveOnStair()
     {
         RaycastHit hit;
         Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 2f, stepBrickLayer);
@@ -57,50 +63,35 @@ public class Player : MonoBehaviour
 
     }
 
-    private void MoveDownStairSmooth()
+    protected void MoveDownStairSmooth()
     {
         currentVeloctiyY = rigidbody.velocity.y;
-        if(previousVelocityY-currentVeloctiyY > 0.15f)
+        if (previousVelocityY - currentVeloctiyY > 0.15f)
         {
             rigidbody.velocity = new Vector3(rigidbody.velocity.x,
-                                             Mathf.Min(currentVeloctiyY, -5f), 
+                                             Mathf.Min(currentVeloctiyY, -5f),
                                              rigidbody.velocity.z);
         }
 
         previousVelocityY = currentVeloctiyY;
     }
 
-    private void Move()
-    {
-        rigidbody.velocity = new Vector3(joystick.Horizontal * speed + Input.GetAxis("Horizontal") * speed,
-                                         rigidbody.velocity.y,
-                                         joystick.Vertical * speed + Input.GetAxis("Vertical") * speed);
-
-        Vector3 direct1 = new Vector3(joystick.Horizontal, 0, joystick.Vertical);
-        Vector3 direct2 = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-
-        if (Vector3.Distance(direct1, Vector3.zero) > 0.1f) 
-            transform.rotation = Quaternion.LookRotation(direct1);
-        if (Vector3.Distance(direct2, Vector3.zero) > 0.1f)
-            transform.rotation = Quaternion.LookRotation(direct2);
-    }
-
-    private void SpawnBricks()
+    protected void SpawnBricks()
     {
         RaycastHit hit;
 
-        Physics.Raycast(transform.position, Vector3.down, out hit, 2f,groundLayer);
-        Debug.DrawRay(transform.position, Vector3.down*2f, Color.yellow, 2f);
+        Physics.Raycast(transform.position, Vector3.down, out hit, 2f, groundLayer);
+        Debug.DrawRay(transform.position, Vector3.down * 2f, Color.yellow, 2f);
 
-        if(hit.collider != null)
+        if (hit.collider != null)
         {
-            hit.collider.gameObject.GetComponent<SpawnBricks>().SpawnBrick(transform.GetComponent<Renderer>().sharedMaterial);
+            hit.collider.gameObject.GetComponent<SpawnBricks>().SpawnBrick(bodyColorIndex);
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Brick")
+        if (other.gameObject.tag == "Brick")
         {
             if (other.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<MeshRenderer>().sharedMaterial)
             {
