@@ -17,7 +17,14 @@ public class PatrolState : IState
     {
         timer += Time.deltaTime;
 
-
+        if (timer > randomTime)
+        {
+            bot.ChangeState(new IdleState());
+        }
+        else
+        {
+            bot.Moving();
+        }
 
         
     }

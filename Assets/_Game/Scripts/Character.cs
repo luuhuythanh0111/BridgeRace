@@ -14,6 +14,8 @@ public class Character : MonoBehaviour
 
     [SerializeField] protected LayerMask groundLayer;
 
+    [SerializeField] protected LayerMask stepBrickChangeColorLayer;
+
     protected int bodyColorIndex;
 
     protected List<GameObject> bricks = new List<GameObject>();
@@ -37,9 +39,8 @@ public class Character : MonoBehaviour
     protected void CheckMoveOnStair()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 2f, stepBrickLayer);
-        //Debug.DrawLine(transform.position, transform.position + (Vector3.forward + Vector3.down * 0.4f) * 2f, Color.red, 2f);
-
+        Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 1f, stepBrickLayer);
+       
         if (hit.collider != null)
         {
             GameObject block = hit.collider.gameObject;
@@ -52,7 +53,6 @@ public class Character : MonoBehaviour
             {
                 Destroy(bricks[bricks.Count - 1]);
                 bricks.RemoveAt(bricks.Count - 1);
-                block.transform.parent.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
                 block.GetComponent<BoxCollider>().enabled = false;
             }
             else
@@ -60,7 +60,20 @@ public class Character : MonoBehaviour
                 block.GetComponent<BoxCollider>().enabled = true;
             }
         }
+        ChangeColorStep();
+    }
 
+    protected void ChangeColorStep()
+    {
+        RaycastHit hit;
+        Physics.Raycast(transform.position,Vector3.down , out hit, 1f, stepBrickChangeColorLayer);
+        Debug.DrawRay(transform.position, Vector3.down *1f , Color.red, 1f);
+
+        if (hit.collider != null)
+        {
+            GameObject block = hit.collider.gameObject;
+            block.transform.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
+        }
     }
 
     protected void MoveDownStairSmooth()
@@ -81,7 +94,7 @@ public class Character : MonoBehaviour
         RaycastHit hit;
 
         Physics.Raycast(transform.position, Vector3.down, out hit, 2f, groundLayer);
-        Debug.DrawRay(transform.position, Vector3.down * 2f, Color.yellow, 2f);
+        //Debug.DrawRay(transform.position, Vector3.down * 2f, Color.yellow, 2f);
 
         if (hit.collider != null)
         {

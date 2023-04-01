@@ -12,11 +12,18 @@ public class Player : Character
         Move();
     }
 
+    float GetVelocity(float x)
+    {
+        //if (x == 0.0f) return 0f;
+        //return x > 0.0f ? 1f : -1f;
+        return x;
+    }
+
     private void Move()
     {
-        rigidbody.velocity = new Vector3(joystick.Horizontal * speed + Input.GetAxis("Horizontal") * speed,
+        rigidbody.velocity = new Vector3(GetVelocity(joystick.Horizontal) * speed + GetVelocity(Input.GetAxis("Horizontal")) * speed,
                                          rigidbody.velocity.y,
-                                         joystick.Vertical * speed + Input.GetAxis("Vertical") * speed);
+                                         GetVelocity(joystick.Vertical) * speed + GetVelocity(Input.GetAxis("Vertical")) * speed);
 
         Vector3 direct1 = new Vector3(joystick.Horizontal, 0, joystick.Vertical);
         Vector3 direct2 = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
