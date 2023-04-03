@@ -1,17 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Bot : Character
 {
+    [SerializeField] NavMeshAgent navMeshAgent;
+
     private IState currentState;
 
     private Vector3 targetPosition;
 
     protected override void Update()
     {
-        base.Update();
- 
+        SpawnBricks();
         if(currentState!=null)
         {
             currentState.OnExecute(this);
@@ -44,14 +46,6 @@ public class Bot : Character
 
     public void Moving()
     {
-
-        if (Vector3.Distance(targetPosition, transform.position) < 2f)
-        {
-            targetPosition = new Vector3(Random.Range(transform.position.x - 10f, transform.position.x + 10f),
-                                     transform.position.y,
-                                     Random.Range(transform.position.z - 10f, transform.position.z + 10f));
-        }
-
-        transform.position = Vector3.MoveTowards(transform.position,targetPosition,speed * Time.deltaTime);
+        
     }
 }

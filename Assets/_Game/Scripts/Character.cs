@@ -4,89 +4,154 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    [Header("Movement")]
+    public float moveSpeed;
+    public float groundDrag;
+    float horizontalInput;
+    float verticalInput;
     [SerializeField] protected Joystick joystick;
-
     [SerializeField] protected new Rigidbody rigidbody;
 
-    [SerializeField] protected float speed;
 
-    [SerializeField] protected LayerMask stepBrickLayer;
+    [Header("Ground Check")]
+    public float playerHeight;
+    public LayerMask groundLayer;
+    bool grounded;
+    public Transform orientation;
+    Vector3 moveDirection;
 
-    [SerializeField] protected LayerMask groundLayer;
 
-    [SerializeField] protected LayerMask stepBrickChangeColorLayer;
+    [Header("Slope Handling")]
+    public float maxSlopeAngle;
+    private RaycastHit slopeHit;
+    private bool exitingSlope;
 
+    [Header("Color and Change Direction")]
+    [SerializeField] GameObject playerBody;
     protected int bodyColorIndex;
 
-    protected List<GameObject> bricks = new List<GameObject>();
-
-    protected float previousVelocityY;
-    protected float currentVeloctiyY;
 
     protected void Start()
     {
         bodyColorIndex = Random.Range(0, FindObjectOfType<LevelManager>().materials.Count);
-        transform.GetComponent<Renderer>().sharedMaterial = FindObjectOfType<LevelManager>().GetMaterialFromNumber(bodyColorIndex);
+        playerBody.GetComponent<Renderer>().sharedMaterial = FindObjectOfType<LevelManager>().GetMaterialFromNumber(bodyColorIndex);
+        rigidbody.drag = groundDrag;
     }
 
     protected virtual void Update()
     {
-        CheckMoveOnStair();
-        MoveDownStairSmooth();
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, groundLayer);
+
+        MyInput();
+        SpeedControl();
         SpawnBricks();
     }
 
-    protected void CheckMoveOnStair()
+    protected void FixedUpdate()
     {
-        RaycastHit hit;
-        Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 1f, stepBrickLayer);
-       
-        if (hit.collider != null)
-        {
-            GameObject block = hit.collider.gameObject;
-
-            if (block.transform.parent.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<Renderer>().sharedMaterial)
-            {
-                block.GetComponent<BoxCollider>().enabled = false;
-            }
-            else if (bricks.Count > 0)
-            {
-                Destroy(bricks[bricks.Count - 1]);
-                bricks.RemoveAt(bricks.Count - 1);
-                block.GetComponent<BoxCollider>().enabled = false;
-            }
-            else
-            {
-                block.GetComponent<BoxCollider>().enabled = true;
-            }
-        }
-        ChangeColorStep();
+        MovePlayer();
     }
 
-    protected void ChangeColorStep()
-    {
-        RaycastHit hit;
-        Physics.Raycast(transform.position,Vector3.down , out hit, 1f, stepBrickChangeColorLayer);
-        Debug.DrawRay(transform.position, Vector3.down *1f , Color.red, 1f);
 
-        if (hit.collider != null)
+    private void MyInput()
+    {
+        //horizontalInput = Input.GetAxis("Horizontal");
+        //verticalInput = Input.GetAxis("Vertical");
+
+        horizontalInput = joystick.Horizontal;
+        verticalInput = joystick.Vertical;
+    }
+
+    private void MovePlayer()
+    {
+        // calculate movement direction
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        // on slope
+        if (OnSlope() && !exitingSlope) 
         {
-            GameObject block = hit.collider.gameObject;
-            block.transform.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
+            RaycastHit hitLeft;
+            RaycastHit hitRight;
+
+            Physics.Raycast(transform.position, Vector3.left, out hitLeft,1f);
+            Debug.DrawRay(transform.position, Vector3.left, Color.green, 2f);
+            
+            Physics.Raycast(transform.position, Vector3.right, out hitRight, 1f);
+            Debug.DrawRay(transform.position, Vector3.right, Color.green, 2f);
+
+
+            if(hitLeft.collider != null  && horizontalInput <0f)
+            {
+                if(verticalInput>0f)
+                {
+                    
+                    moveDirection += moveSpeed * orientation.forward * (playerBody.transform.rotation.y+90)/90f;
+                }
+                else if(verticalInput<0f)
+                {                  
+                    moveDirection += -1f * orientation.forward * (playerBody.transform.rotation.y+90)/90f;
+                }
+            }
+
+            else if (hitRight.collider != null && horizontalInput > 0f)
+            {
+                if (verticalInput > 0f)
+                {
+
+                    moveDirection += moveSpeed * orientation.forward * (playerBody.transform.rotation.y + 90) / 90f;
+                }
+                else if (verticalInput < 0f)
+                {
+                    moveDirection += -1f * orientation.forward * (playerBody.transform.rotation.y + 90) / 90f;
+                }
+            }
+
+            rigidbody.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f, ForceMode.Force);
+
+            if (rigidbody.velocity.y > 0)
+                rigidbody.AddForce(Vector3.down * 80f, ForceMode.Force);
+        }
+
+        // on ground
+        else if (grounded)
+            rigidbody.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+
+        ChangeDirection();
+    }
+
+    private void ChangeDirection()
+    {
+        Vector3 direct2 = new Vector3(horizontalInput, 0, verticalInput);
+
+        if (Vector3.Distance(direct2, Vector3.zero) > 0.1f)
+            playerBody.transform.rotation = Quaternion.LookRotation(direct2);
+    }
+
+    private void SpeedControl()
+    {
+        Vector3 flatVel = new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z);
+
+        if (flatVel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            rigidbody.velocity = new Vector3(limitedVel.x, rigidbody.velocity.y, limitedVel.z);
         }
     }
 
-    protected void MoveDownStairSmooth()
+    private bool OnSlope()
     {
-        currentVeloctiyY = rigidbody.velocity.y;
-        if (previousVelocityY - currentVeloctiyY > 0.15f)
+        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
         {
-            rigidbody.velocity = new Vector3(rigidbody.velocity.x,
-                                             Mathf.Min(currentVeloctiyY, -5f),
-                                             rigidbody.velocity.z);
+            float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
+            return angle < maxSlopeAngle && angle != 0;
         }
 
-        previousVelocityY = currentVeloctiyY;
+        return false;
+    }
+
+    private Vector3 GetSlopeMoveDirection()
+    {
+        return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
     }
 
     protected void SpawnBricks()
@@ -102,17 +167,12 @@ public class Character : MonoBehaviour
         }
     }
 
-    protected void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Brick")
         {
-            if (other.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<MeshRenderer>().sharedMaterial)
-            {
-                other.transform.parent.SetParent(transform);
-                bricks.Add(other.transform.parent.gameObject);
-                other.transform.parent.localPosition = Vector3.back * 0.4f + Vector3.up * (bricks.Count + 1) * 0.2f;
-                other.transform.parent.localRotation = Quaternion.identity;
-            }
+
+            playerBody.GetComponent<PlayerControlBricks>().EatingBrick(other);
         }
 
     }
