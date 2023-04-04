@@ -2,30 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IdleState : IState
+public class BuildBridgeState : IState
 {
-    float randomTime;
-    float timer;
-
     public void OnEnter(Bot bot)
     {
         bot.StopMoving();
-        timer = 0;
-        randomTime = Random.Range(0f, 0f);
+        bot.GoToBridge();
     }
 
     public void OnExecute(Bot bot)
     {
-        timer += Time.deltaTime;
-
-        if(timer>randomTime)
+        if(bot.GetComponentInChildren<PlayerControlBricks>().bricks.Count==0)
         {
-            bot.ChangeState(new PatrolState());
+            bot.StopMoving();
+            bot.GetDownBridge();
+            Debug.Log("GET DOWN");
         }
     }
 
     public void OnExit(Bot bot)
     {
-
+    
     }
 }

@@ -10,13 +10,13 @@ public class Character : MonoBehaviour
     protected float horizontalInput;
     protected float verticalInput;
     [SerializeField] protected Joystick joystick;
-    [SerializeField] protected new Rigidbody rigidbody;
+    [SerializeField] internal new Rigidbody rigidbody;
 
 
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask groundLayer;
-    bool grounded;
+    internal bool grounded;
     public Transform orientation;
     Vector3 moveDirection;
 
@@ -27,13 +27,19 @@ public class Character : MonoBehaviour
     private bool exitingSlope;
 
     [Header("Color and Change Direction")]
-    [SerializeField] GameObject playerBody;
+    [SerializeField] protected GameObject playerBody;
     protected int bodyColorIndex;
 
 
-    protected void Start()
+    protected virtual void Start()
     {
+    reChangeColor:
         bodyColorIndex = Random.Range(0, FindObjectOfType<LevelManager>().materials.Count);
+
+        if (FindObjectOfType<LevelManager>().CheckUsedColor(bodyColorIndex) == false)
+        {
+            goto reChangeColor;
+        }
         playerBody.GetComponent<Renderer>().sharedMaterial = FindObjectOfType<LevelManager>().GetMaterialFromNumber(bodyColorIndex);
         rigidbody.drag = groundDrag;
     }

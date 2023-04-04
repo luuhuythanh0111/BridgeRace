@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 public class Bot : Character
 {
@@ -9,15 +11,29 @@ public class Bot : Character
 
     private IState currentState;
 
+    private int currentPlatformIndex;
+
     internal Vector3 targetBrickPosition = Vector3.zero;
     internal Vector3 targetPosition = Vector3.zero;
     internal bool goingToTargert = false;
     internal bool haveTarget = false;
+    internal bool haveGetDown = false;
+    internal int randomTargetBrick;
+
+    protected override void Start()
+    {
+        base.Start();
+        randomTargetBrick = Random.Range(1, 21);
+        currentPlatformIndex = 0;
+        Debug.Log(randomTargetBrick);
+    }
+
+    
 
     protected override void Update()
     {
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, groundLayer);
         SpawnBricks();
-        Debug.Log(currentState);
         if(currentState!=null)
         {
             currentState.OnExecute(this);
@@ -50,7 +66,13 @@ public class Bot : Character
 
     public void Moving()
     {
-        if(haveTarget==false)
+        if (randomTargetBrick <= playerBody.GetComponent<PlayerControlBricks>().bricks.Count)
+        {
+            ChangeState(new BuildBridgeState());
+            return;
+        }
+
+        if (haveTarget==false)
         {
             if (Vector3.Distance(transform.position, targetPosition) < 0.2f || Vector3.Distance(Vector3.zero, targetPosition) < 0.2f || (rigidbody.velocity.x == 0f && rigidbody.velocity.z == 0f))
             {
@@ -80,6 +102,25 @@ public class Bot : Character
                 }
             }
         }
-        
+    }
+
+    public void GoToBridge()
+    {
+        navMeshAgent.SetDestination(FindObjectOfType<LevelManager>().platforms[++currentPlatformIndex].transform.position);
+    }
+    
+    public void GetDownBridge()
+    {
+        if (haveGetDown == false)
+        {
+            navMeshAgent.SetDestination(FindObjectOfType<LevelManager>().platforms[--currentPlatformIndex].transform.position);
+            haveGetDown = true;
+        }
+
+        if (grounded)
+        {
+            ChangeState(new PatrolState());
+            haveGetDown = false;
+        }
     }
 }

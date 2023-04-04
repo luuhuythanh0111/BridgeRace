@@ -6,7 +6,7 @@ public class PlayerControlBricks : MonoBehaviour
 {
     [SerializeField] protected LayerMask stepBrickLayer;
     [SerializeField] protected LayerMask stepBrickChangeColorLayer;
-    protected List<GameObject> bricks = new List<GameObject>();
+    internal List<GameObject> bricks = new List<GameObject>();
 
     private void Update()
     {
@@ -16,8 +16,8 @@ public class PlayerControlBricks : MonoBehaviour
     protected void CheckMoveOnStair()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 1f, stepBrickLayer);
-
+        Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 1.5f, stepBrickLayer);
+        Debug.DrawRay(transform.position, (Vector3.forward + Vector3.down * 0.4f)*1.5f, Color.green, 1f);
         if (hit.collider != null)
         {
             GameObject block = hit.collider.gameObject;
@@ -43,11 +43,12 @@ public class PlayerControlBricks : MonoBehaviour
     protected void ChangeColorStep()
     {
         RaycastHit hit;
-        Physics.Raycast(transform.position, Vector3.down, out hit, 1f, stepBrickChangeColorLayer);
-        Debug.DrawRay(transform.position, Vector3.down * 1f, Color.red, 1f);
+        Physics.Raycast(transform.position, Vector3.down, out hit, 2f, stepBrickChangeColorLayer);
+        
 
         if (hit.collider != null)
         {
+            //Debug.DrawRay(transform.position, Vector3.down * 2f, Color.red, 1f);
             GameObject block = hit.collider.gameObject;
             block.transform.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
         }
