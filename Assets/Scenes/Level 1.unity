@@ -2535,6 +2535,7 @@ GameObject:
   - component: {fileID: 1222123191}
   - component: {fileID: 1222123194}
   - component: {fileID: 1222123193}
+  - component: {fileID: 1222123195}
   m_Layer: 0
   m_Name: Bot
   m_TagString: Untagged
@@ -2609,8 +2610,8 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -334000983
   m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
+  m_Speed: 7
+  m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
@@ -2618,9 +2619,31 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2
-  m_BaseOffset: 0
+  m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1222123195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1222123189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 993e723c28d396e41a7e0564b8bee7b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 7
+  angle: 120
+  playerRef: {fileID: 7152739660539064530, guid: 6af2d23f19804f846b2ed78cd7520ac5, type: 3}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 512
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  canSeePlayer: 0
 --- !u!1001 &1228065103
 PrefabInstance:
   m_ObjectHideFlags: 0

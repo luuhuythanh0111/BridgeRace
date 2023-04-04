@@ -11,7 +11,7 @@ public class IdleState : IState
     {
         bot.StopMoving();
         timer = 0;
-        randomTime = Random.Range(2f, 4f);
+        randomTime = Random.Range(0f, 1f);
     }
 
     public void OnExecute(Bot bot)

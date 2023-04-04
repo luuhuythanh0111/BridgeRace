@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 6026952309527563031}
   - component: {fileID: 4651685215430946565}
   - component: {fileID: 4264023341472807458}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube
   m_TagString: Brick
   m_Icon: {fileID: 0}

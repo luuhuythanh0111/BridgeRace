@@ -7,8 +7,8 @@ public class Character : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed;
     public float groundDrag;
-    float horizontalInput;
-    float verticalInput;
+    protected float horizontalInput;
+    protected float verticalInput;
     [SerializeField] protected Joystick joystick;
     [SerializeField] protected new Rigidbody rigidbody;
 
@@ -62,7 +62,7 @@ public class Character : MonoBehaviour
         verticalInput = joystick.Vertical;
     }
 
-    private void MovePlayer()
+    protected void MovePlayer()
     {
         // calculate movement direction
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
