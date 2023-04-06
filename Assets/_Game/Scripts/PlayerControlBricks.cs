@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerControlBricks : MonoBehaviour
 {
+    [SerializeField] protected bool isImportant;
     [SerializeField] protected LayerMask stepBrickLayer;
     [SerializeField] protected LayerMask stepBrickChangeColorLayer;
     internal List<GameObject> bricks = new List<GameObject>();
@@ -15,6 +16,11 @@ public class PlayerControlBricks : MonoBehaviour
 
     protected void CheckMoveOnStair()
     {
+        if(!isImportant)
+        {
+            ChangeColorStep();
+            return;
+        }
         RaycastHit hit;
         Physics.Raycast(transform.position, Vector3.forward + Vector3.down * 0.4f, out hit, 1.5f, stepBrickLayer);
         Debug.DrawRay(transform.position, (Vector3.forward + Vector3.down * 0.4f)*1.5f, Color.green, 1f);
@@ -22,20 +28,23 @@ public class PlayerControlBricks : MonoBehaviour
         {
             GameObject block = hit.collider.gameObject;
 
+            Debug.Log(block.transform.parent.GetComponent<Renderer>().sharedMaterial + " " + transform.GetComponent<Renderer>().sharedMaterial);
             if (block.transform.parent.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<Renderer>().sharedMaterial)
             {
-                block.GetComponent<BoxCollider>().enabled = false;
+                    block.GetComponent<BoxCollider>().isTrigger = true;
+                
             }
-            else if (bricks.Count > 0)
+            else if(block.transform.parent.GetComponent<Renderer>().sharedMaterial != transform.GetComponent<Renderer>().sharedMaterial)
             {
-                Destroy(bricks[bricks.Count - 1]);
-                bricks.RemoveAt(bricks.Count - 1);
-                block.GetComponent<BoxCollider>().enabled = false;
+                
+                if (bricks.Count > 0)
+                    block.GetComponent<BoxCollider>().isTrigger = true;
+                else
+                {
+                    block.GetComponent<BoxCollider>().isTrigger = false;
+                }
             }
-            else
-            {
-                block.GetComponent<BoxCollider>().enabled = true;
-            }
+            
         }
         ChangeColorStep();
     }
@@ -50,7 +59,16 @@ public class PlayerControlBricks : MonoBehaviour
         {
             //Debug.DrawRay(transform.position, Vector3.down * 2f, Color.red, 1f);
             GameObject block = hit.collider.gameObject;
-            block.transform.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
+            if(block.transform.GetComponent<Renderer>().sharedMaterial != transform.GetComponent<Renderer>().sharedMaterial)
+            {
+                if(bricks.Count>0)
+                {
+                    Destroy(bricks[bricks.Count - 1]);
+                    bricks.RemoveAt(bricks.Count - 1);
+                    block.transform.GetComponent<Renderer>().sharedMaterial = transform.GetComponent<Renderer>().sharedMaterial;
+                }
+            }
+            
         }
     }
 

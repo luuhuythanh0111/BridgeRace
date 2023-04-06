@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -22,13 +23,10 @@ public class LevelManager : MonoBehaviour
     [SerializeField] internal List<GameObject> platforms = new List<GameObject>();
 
     private bool[] usedColor = new bool[10];
-    private void Start()
-    {
-
-    }
-
+    internal List <int> indexUsingColor = new List <int> ();
     public bool CheckUsedColor(int index)
     {
+        if (!usedColor[index]) indexUsingColor.Add(index);
         return !usedColor[index];
     }
     public Material GetMaterialFromNumber(int number)

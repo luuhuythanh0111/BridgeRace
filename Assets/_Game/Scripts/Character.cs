@@ -29,8 +29,6 @@ public class Character : MonoBehaviour
     [Header("Color and Change Direction")]
     [SerializeField] protected GameObject playerBody;
     protected int bodyColorIndex;
-
-
     protected virtual void Start()
     {
     reChangeColor:
@@ -46,7 +44,7 @@ public class Character : MonoBehaviour
 
     protected virtual void Update()
     {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, groundLayer);
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.5f, groundLayer);
 
         MyInput();
         SpeedControl();

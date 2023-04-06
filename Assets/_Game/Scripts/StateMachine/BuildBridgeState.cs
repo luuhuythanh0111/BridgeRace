@@ -12,16 +12,19 @@ public class BuildBridgeState : IState
 
     public void OnExecute(Bot bot)
     {
-        if(bot.GetComponentInChildren<PlayerControlBricks>().bricks.Count==0)
+        if (bot.GoToNextPlatform())
+            return;
+        if (bot.GetComponentInChildren<PlayerControlBricks>().bricks.Count==0)
         {
-            bot.StopMoving();
             bot.GetDownBridge();
-            Debug.Log("GET DOWN");
+            //Debug.Log("GET DOWN");
         }
+        
+
     }
 
     public void OnExit(Bot bot)
     {
-    
+        bot.StopMoving();
     }
 }

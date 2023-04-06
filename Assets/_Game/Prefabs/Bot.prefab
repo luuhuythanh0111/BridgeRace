@@ -260,7 +260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 7
-  angle: 120
+  angle: 360
   playerRef: {fileID: 7152739660539064530, guid: 6af2d23f19804f846b2ed78cd7520ac5, type: 3}
   targetMask:
     serializedVersion: 2

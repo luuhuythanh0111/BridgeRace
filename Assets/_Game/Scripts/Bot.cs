@@ -23,16 +23,15 @@ public class Bot : Character
     protected override void Start()
     {
         base.Start();
-        randomTargetBrick = Random.Range(1, 21);
+        randomTargetBrick = Random.Range(2, 21);
+        //randomTargetBrick = 40;
         currentPlatformIndex = 0;
-        Debug.Log(randomTargetBrick);
+        //Debug.Log(randomTargetBrick);
     }
-
-    
 
     protected override void Update()
     {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, groundLayer);
+        grounded = Physics.Raycast(transform.position, Vector3.down, 3f, groundLayer);
         SpawnBricks();
         if(currentState!=null)
         {
@@ -88,7 +87,6 @@ public class Bot : Character
         }
         else
         {
-            
             if(goingToTargert==false)
             {
                 navMeshAgent.SetDestination(targetBrickPosition);
@@ -96,7 +94,8 @@ public class Bot : Character
             }
             else
             {
-                if(Vector3.Distance(targetBrickPosition,transform.position)<0.2f)
+                
+                if (navMeshAgent.pathStatus == NavMeshPathStatus.PathComplete)
                 {
                     haveTarget = false;
                 }
@@ -106,19 +105,35 @@ public class Bot : Character
 
     public void GoToBridge()
     {
-        navMeshAgent.SetDestination(FindObjectOfType<LevelManager>().platforms[++currentPlatformIndex].transform.position);
+        targetPosition = FindObjectOfType<LevelManager>().platforms[++currentPlatformIndex].transform.position;
+        navMeshAgent.SetDestination(targetPosition);
+    }
+
+    public bool GoToNextPlatform()
+    {
+        //Debug.Log(Vector3.Distance(targetPosition, transform.position));
+        if(Vector3.Distance(targetPosition,transform.position)<3f)
+        {
+            
+            ChangeState(new PatrolState());
+            return true;
+        }
+        return false;
     }
     
     public void GetDownBridge()
     {
         if (haveGetDown == false)
         {
-            navMeshAgent.SetDestination(FindObjectOfType<LevelManager>().platforms[--currentPlatformIndex].transform.position);
+            targetPosition = FindObjectOfType<LevelManager>().platforms[--currentPlatformIndex].transform.position;
+            navMeshAgent.SetDestination(targetPosition);
             haveGetDown = true;
         }
-
-        if (grounded)
+        else 
+        if (grounded || Vector3.Distance(targetPosition,transform.position)<0.2f)
         {
+            randomTargetBrick = Random.Range(2, 21);
+            //Debug.Log(randomTargetBrick);
             ChangeState(new PatrolState());
             haveGetDown = false;
         }

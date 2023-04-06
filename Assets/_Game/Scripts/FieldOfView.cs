@@ -6,6 +6,7 @@ using static UnityEngine.GraphicsBuffer;
 
 public class FieldOfView : MonoBehaviour
 {
+    [SerializeField] GameObject bot;
     public float radius;
     [Range(0, 360)]
     public float angle;
@@ -39,8 +40,13 @@ public class FieldOfView : MonoBehaviour
         Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);
 
         if (rangeChecks.Length != 0)
+        for(int i=0; i<rangeChecks.Length; i++)
         {
-            Transform target = rangeChecks[0].transform;
+            
+            Transform target = rangeChecks[i].transform;
+                if (target.GetComponent<Renderer>().sharedMaterial !=
+                            bot.transform.GetChild(0).GetComponent<Renderer>().sharedMaterial) continue;
+                   
             Vector3 directionToTarget = (target.position - transform.position).normalized;
 
             if (Vector3.Angle(transform.forward, directionToTarget) < angle / 2)
@@ -50,31 +56,27 @@ public class FieldOfView : MonoBehaviour
                 if (!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstructionMask))
                 {
                     canSeePlayer = true;
-                    transform.GetComponent<Bot>().targetBrickPosition = target.position;
-                    transform.GetComponent<Bot>().haveTarget = true;
-                    transform.GetComponent<Bot>().goingToTargert = false;
+                    if (transform.GetComponent<Bot>().haveTarget == false)
+                    {
+                        transform.GetComponent<Bot>().targetBrickPosition = target.position;
+                        transform.GetComponent<Bot>().haveTarget = true;
+                        transform.GetComponent<Bot>().goingToTargert = false;
+                        break;
+                    }
                 }
                 else
                 {
                     canSeePlayer = false;
-                    transform.GetComponent<Bot>().targetBrickPosition = target.position;
-                    transform.GetComponent<Bot>().haveTarget = false;
-                    transform.GetComponent<Bot>().goingToTargert = false;
                 }
             }
             else
             {
                 canSeePlayer = false;
-                transform.GetComponent<Bot>().targetBrickPosition = target.position;
-                transform.GetComponent<Bot>().haveTarget = false;
-                transform.GetComponent<Bot>().goingToTargert = false;
             }
         }
         else if (canSeePlayer)
         {
             canSeePlayer = false;
-            transform.GetComponent<Bot>().haveTarget = false;
-            transform.GetComponent<Bot>().goingToTargert = false;
         }
     }
 }
