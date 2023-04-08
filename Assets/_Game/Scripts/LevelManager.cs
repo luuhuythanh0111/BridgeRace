@@ -22,11 +22,12 @@ public class LevelManager : MonoBehaviour
     [SerializeField] internal List <Material> materials = new List <Material> ();
     [SerializeField] internal List<GameObject> platforms = new List<GameObject>();
 
+    internal List<int> usedCololIndex = new List<int>();
     private bool[] usedColor = new bool[10];
-    internal List <int> indexUsingColor = new List <int> ();
     public bool CheckUsedColor(int index)
     {
-        if (!usedColor[index]) indexUsingColor.Add(index);
+        if(!usedColor[index])
+            usedCololIndex.Add(index);
         return !usedColor[index];
     }
     public Material GetMaterialFromNumber(int number)
