@@ -28,7 +28,7 @@ public class PlayerControlBricks : MonoBehaviour
         {
             GameObject block = hit.collider.gameObject;
 
-            //Debug.Log(block.transform.parent.GetComponent<Renderer>().sharedMaterial + " " + transform.GetComponent<Renderer>().sharedMaterial);
+            Debug.Log(block.transform.parent.GetComponent<Renderer>().sharedMaterial + " " + transform.GetComponent<Renderer>().sharedMaterial);
             if (block.transform.parent.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<Renderer>().sharedMaterial)
             {
                     block.GetComponent<BoxCollider>().isTrigger = true;
@@ -76,15 +76,11 @@ public class PlayerControlBricks : MonoBehaviour
     {
         if (other.GetComponent<Renderer>().sharedMaterial == transform.GetComponent<MeshRenderer>().sharedMaterial)
         {
-            int x = other.GetComponentInParent<Brick>().x;
-            int y = other.GetComponentInParent<Brick>().y;
-            other.transform.parent.parent.parent.GetComponent<SpawnBricks>().haveSpawnThisCoordinate[x, y] = false;
+                
             other.transform.parent.SetParent(transform);
             bricks.Add(other.transform.parent.gameObject);
             other.transform.parent.localPosition = Vector3.back * 0.4f + Vector3.up * (bricks.Count + 1) * 0.2f;
             other.transform.parent.localRotation = Quaternion.identity;
-            
-            
         }
     }
 }
