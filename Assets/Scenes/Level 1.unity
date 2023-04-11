@@ -13585,31 +13585,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9095770195048592514, guid: 02e7e9afbb933aa46a512b11bd4d5452, type: 3}
   m_PrefabInstance: {fileID: 1192458531}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< Updated upstream
 --- !u!1001 &1193311092
 PrefabInstance:
-=======
-  m_GameObject: {fileID: 1222123189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab629475a21197c49b9082cb99f47199, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 7
-  groundDrag: 5
-  joystick: {fileID: 0}
-  rigidbody: {fileID: 1222123191}
-  playerHeight: 2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  orientation: {fileID: 306822503}
-  maxSlopeAngle: 40
-  playerBody: {fileID: 568797925}
-  navMeshAgent: {fileID: 0}
---- !u!195 &1222123194
-NavMeshAgent:
->>>>>>> Stashed changes
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:

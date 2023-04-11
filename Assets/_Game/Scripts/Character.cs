@@ -31,17 +31,10 @@ public class Character : MonoBehaviour
     protected int bodyColorIndex;
     protected virtual void Start()
     {
-<<<<<<< Updated upstream
     reChangeColor:
         bodyColorIndex = Random.Range(0, FindObjectOfType<LevelManager>().materials.Count);
 
         if (FindObjectOfType<LevelManager>().CheckUsedColor(bodyColorIndex) == false)
-=======
-        reChangeColor:
-        bodyColorIndex = Random.Range(0, FindObjectOfType<LevelManager>().materials.Count);
-
-        if(FindObjectOfType<LevelManager>().CheckUsedColor(bodyColorIndex)==false)
->>>>>>> Stashed changes
         {
             goto reChangeColor;
         }

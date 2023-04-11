@@ -11,7 +11,6 @@ public class Bot : Character
 
     private IState currentState;
 
-<<<<<<< Updated upstream
     private int currentPlatformIndex;
 
     internal Vector3 targetBrickPosition = Vector3.zero;
@@ -29,11 +28,6 @@ public class Bot : Character
         currentPlatformIndex = 0;
         //Debug.Log(randomTargetBrick);
     }
-=======
-    private Vector3 targetPosition = Vector3.zero;
-
-    private bool isMoving = false;
->>>>>>> Stashed changes
 
     protected override void Update()
     {
@@ -66,13 +60,11 @@ public class Bot : Character
 
     public void StopMoving()
     {
-        isMoving = false;
         rigidbody.velocity = Vector3.zero;
     }
 
     public void Moving()
     {
-<<<<<<< Updated upstream
         if (randomTargetBrick <= playerBody.GetComponent<PlayerControlBricks>().bricks.Count)
         {
             ChangeState(new BuildBridgeState());
@@ -145,17 +137,5 @@ public class Bot : Character
             ChangeState(new PatrolState());
             haveGetDown = false;
         }
-=======
-        if (isMoving == false)
-        {
-            horizontalInput = Random.Range(-1f, 1f);
-            verticalInput = (Random.Range(0, 2) == 0 ? 1 : -1)
-            
-            isMoving = true;
-        }
-        
-        MovePlayer();
-
->>>>>>> Stashed changes
     }
 }
