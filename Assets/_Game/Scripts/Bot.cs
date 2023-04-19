@@ -70,6 +70,7 @@ public class Bot : Character
             ChangeState(new BuildBridgeState());
             return;
         }
+        Debug.Log(haveTarget);
 
         if (haveTarget==false)
         {
@@ -94,8 +95,7 @@ public class Bot : Character
             }
             else
             {
-                
-                if (navMeshAgent.pathStatus == NavMeshPathStatus.PathComplete)
+                if (Vector3.Distance(targetBrickPosition,transform.position)<1f)
                 {
                     haveTarget = false;
                 }
@@ -134,6 +134,7 @@ public class Bot : Character
         {
             randomTargetBrick = Random.Range(2, 21);
             //Debug.Log(randomTargetBrick);
+            haveTarget = false;
             ChangeState(new PatrolState());
             haveGetDown = false;
         }
